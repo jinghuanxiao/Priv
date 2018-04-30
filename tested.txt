@@ -1,0 +1,44 @@
+Systems tested for agobot3 compatibility
+-------------------------------------------
+
+Num	Dist						Kernel/SP		libc&gcc/Visual Studio
+1.	Debian 3.0					2.4.20-3-k6		libc6 / gcc version 3.3.1 20030728 (Debian prerelease)
+2.	Slackware 9.0				2.4.20			libc6 / gcc version 3.2.2
+3.	FreeBSD 4.8					???				libc6 / gcc version 3.3.1 20030728 (Debian prerelease) / compiled in debian
+4.	SuSe 8.1					2.4.21			libc6 / gcc version 3.2
+5.	Windows 2000 Server English	SP4				Visual Studio 6.0 SP5
+6.	Windows 2000 Server English	SP3				Visual Studio 6.0 SP5
+7.	Windows 2000 Pro English	SP4				Visual Studio 6.0 SP5
+8.	Windows 2000 Pro English	SP3				Visual Studio 6.0 SP5
+9.	Windows 2000 Pro German		SP1				Visual Studio 6.0 SP5
+10.	Windows 2003 Server English	SP0				Visual Studio 6.0 SP5
+11.	Windows 2003 Server English	SP1				Visual Studio 6.0 SP5
+12.	Windows XP Pro English		SP0				Visual Studio 6.0 SP5
+13.	Windows XP Pro English		SP1				Visual Studio 6.0 SP5
+
+Win32:
+---------
+You need Visual Studio 6.0 with Service Sack 5 (*) and the newest
+Platform SDK (**) and the newest Processor Pack (***). Install
+all software, then add these paths to "Tools|Options...|Directories"
+in Visual Studio (be sure to include them on top of the list):
+
+to Show directories for|Executable files:
+<path to sdk>\MICROSOFT SDK\BIN
+
+to Show directories for|Include files:
+<path to sdk>\MICROSOFT SDK\INCLUDE
+
+to Show directories for|Library files:
+<path to sdk>\MICROSOFT SDK\LIB
+
+Notes:
+1. Make sure the added paths are on top of the list!
+2. You don't need the full 129mb sdk download, only Core SDK/Build Environment
+3. No Visual Studio .NET for now, if someone wants to send a patch, ill include it.
+
+You should be ready to compile.
+
+(*)		http://msdn.microsoft.com/vstudio/downloads/updates/sp/vs6/sp5/
+(**)	http://www.microsoft.com/msdownload/platformsdk/sdkupdate/ (Core SDK/Build Environment)
+(***)	http://msdn.microsoft.com/vstudio/downloads/tools/ppack/default.aspx

@@ -1,0 +1,30 @@
+1.	.scan.stats
+2.	identd thread
+3.	maybe ".logic.if" and ".logic.else"
+4.	asm/3dnow synflood checksum
+5.	polymorphic engine in assembler
+6.	spoofed udp flood
+7.	dcc support
+8.	screenshot support
+9.	udp/icmp flood
+10.	ring0, make access to the file fully stealth
+11.	hook NtQuerySustemInformation to hide from taskmgr
+12.	vtalk 
+13.	sdbot compatibility class
+14.	.logic.if irc_hostname contains .edu - .cvar.set si_server "edu.server.com"
+15.	.thread.list .thread.kill ( std::list based thread list )
+16.	install location ( bot_path, "%WINDIR%" )
+17.	.bot.shell spawns a command shell and redirects io to irc
+18. dcom using spoofed udp
+19.	faster portscanner
+20.	keylogger/cache pw getter
+21.	built in iroffer or own xdcc bot
+22.	bnc using the old ircgate.cpp
+23. .file.findfile, .file.findmd5 & .file.sendfile
+24.	make service startup
+25.	getadm or newer shatter-style attacks
+26.	messenger exploit
+27.	.addservice .addautostart
+28.	topic commands
+29. built-in ftp/http server (.bot.ftpsrv <port> <usr> <pw>) (.bot.httpsrv <port>)
+30. md5 sums for bot updates
