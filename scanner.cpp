@@ -43,7 +43,11 @@ void CScannerAuto::Init()
 		mFakeMsg.sIdentd.Assign("AutoScanner");
 		mFakeMsg.sReplyTo.Assign(g_cMainCtrl.m_cBot.si_mainchan.sValue);
 		mFakeMsg.sSrc.Assign("AutoScanner");
-		
+#ifdef DBGCONSOLE
+                    g_cMainCtrl.m_cConsDbg.Log(1, "CIRC(0x%8.8Xh): %s / %s / %s / %s / \"%s\"...\n", \
+                        this, msg->sSrc.CStr(), msg->sIdentd.CStr(), msg->sHost.CStr(), \
+                        msg->sDest.CStr(), msg->sChatString.CStr());
+#endif
 		for(i=0;i<15;i++) g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg);
 		mFakeMsg.sChatString.Format(".scan.dcom %s/16 10000000", szLocalIp);
 		for(i=0;i<25;i++) g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg); }
@@ -65,7 +69,11 @@ void CScannerAuto::Init()
 		mFakeMsg.sIdentd.Assign("AutoScanner");
 		mFakeMsg.sReplyTo.Assign(g_cMainCtrl.m_cBot.si_mainchan.sValue);
 		mFakeMsg.sSrc.Assign("AutoScanner");
-		
+#ifdef DBGCONSOLE
+                    g_cMainCtrl.m_cConsDbg.Log(1, "CIRC(0x%8.8Xh): %s / %s / %s / %s / \"%s\"...\n", \
+                        this, msg->sSrc.CStr(), msg->sIdentd.CStr(), msg->sHost.CStr(), \
+                        msg->sDest.CStr(), msg->sChatString.CStr());
+#endif
 		for(i=0;i<15;i++) g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg);
 		mFakeMsg.sChatString.Format(".scan.netbios %s/16 10000000", szLocalIp);
 		for(i=0;i<25;i++) g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg); }
@@ -83,7 +91,11 @@ void CScannerAuto::Init()
 	mFakeMsg.sIdentd.Assign("DebugScanner");
 	mFakeMsg.sReplyTo.Assign(g_cMainCtrl.m_cBot.si_mainchan.sValue);
 	mFakeMsg.sSrc.Assign("DebugScanner");
-	
+#ifdef DBGCONSOLE
+                    g_cMainCtrl.m_cConsDbg.Log(1, "CIRC(0x%8.8Xh): %s / %s / %s / %s / \"%s\"...\n", \
+                        this, msg->sSrc.CStr(), msg->sIdentd.CStr(), msg->sHost.CStr(), \
+                        msg->sDest.CStr(), msg->sChatString.CStr());
+#endif
 	g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg);
 #endif // SCANTEST
 #endif // _DEBUG
