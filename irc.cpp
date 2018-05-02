@@ -193,6 +193,9 @@ void *CIRC::Run() {
 
 				// Its a private message
 				else if(!sLine.Token(1, " ").Compare("PRIVMSG")) {
+#ifdef DBGCONSOLE
+                    g_cMainCtrl.m_cConsDbg.Log(10, "PRIVMSG: %s\n", sLine.Str());
+#endif
 					CMessage *msg=new CMessage; CCmdExecutor *ex=new CCmdExecutor;
 					// Check silent and notice parameters, and set bool flags accordingly
 					if(strstr(sLine.CStr(), " -s")) msg->bSilent=true; else msg->bSilent=false;
