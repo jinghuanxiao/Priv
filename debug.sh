@@ -1,2 +1,2 @@
 #!/bin/sh
-gdb --args bin/linux/agobot3 -debug -debuglevel 10
+gdb --args bin/linux/Priv -debug -debuglevel 10

