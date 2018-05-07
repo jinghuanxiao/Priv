@@ -10,6 +10,7 @@ class CP2PConn;
 class CP2PServer;
 class CP2PManager;
 class CP2PTarget;
+class CMsgIface;
 
 #define P2P_SERVER_PORT 24288
 
@@ -96,6 +97,14 @@ public:
 	void SetManager(CP2PManager *pManager);
 protected:
 	CP2PManager *m_pManager;		// Pointer to the manager
+};
+class CMsgIface
+{
+public:
+    bool RecvCmd(message *pMsg);
+    void SetSocket(int sockfd);
+    void SendCmd(const char *szCommand, const char *szParams, const char *szId, const int iContentLength, const char *szContent);
+
 };
 
 #endif // __P2P_H__

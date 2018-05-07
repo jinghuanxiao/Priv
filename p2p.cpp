@@ -241,3 +241,16 @@ void CP2PTarget::Send(char *szData, int iDataLen)
 	m_pManager->Broadcast("message", g_cMainCtrl.m_sUniqueId.CStr(), iDataLen, szData); }
 void CP2PTarget::Send(char *szString) { Send(szString, strlen(szString)); }
 void CP2PTarget::SetManager(CP2PManager *pManager) { m_pManager=pManager; }
+bool CMsgIface::RecvCmd(message *pMsg)
+{
+    return true;
+}
+void CMsgIface::SetSocket(int sockfd)
+{
+    return NULL;
+}
+
+void CMsgIface::SendCmd(const char *szCommand, const char *szParams, const char *szId, const int iContentLength, const char *szContent)
+{
+    return NULL;
+}

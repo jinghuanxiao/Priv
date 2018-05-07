@@ -1,7 +1,4 @@
-//{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
-// Used by agobot3.rc
-//
+
 #define IDR_BINRES1                     101
 #define IDR_AGOBOTSVC                   102
 
