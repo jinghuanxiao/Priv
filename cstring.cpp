@@ -67,36 +67,61 @@ char *CString::GetBuffer(int iBufLen)
 int CString::GetLength() const { return m_iLength; }
 
 CString CString::Mid(int iFirst, int iCount) const
-{	if(m_bIsCryptStr) return Decrypt().Mid(iFirst, iCount);
-	CString sTemp; char *szBuf=(char*)malloc(iCount+1);
-	memset(szBuf, 0, iCount+1); memcpy(szBuf, &m_szString[iFirst], iCount);
-	sTemp.Assign(szBuf); return sTemp; }
+{
+    if(m_bIsCryptStr)
+        return Decrypt().Mid(iFirst, iCount);
+    CString sTemp;
+    char *szBuf=(char*)malloc(iCount+1);
+    memset(szBuf, 0, iCount+1);
+    memcpy(szBuf, &m_szString[iFirst], iCount);
+    sTemp.Assign(szBuf);
+    return sTemp;
+}
 CString CString::Mid(int iFirst) const
-{	int iCount=GetLength()-iFirst; return Mid(iFirst, iCount); }
+{
+    int iCount=GetLength()-iFirst;
+    return Mid(iFirst, iCount);
+}
 
 CString CString::Token(int iNum, const char *szDelim, bool bUseQuotes)
-{	if(m_bIsCryptStr) return Decrypt().Token(iNum, szDelim, bUseQuotes);
-	std::vector<char*> vTokens; CString sTemp(m_szString); char *szText=sTemp.Str();
-	bool bInQuotes=false; while(*szText)
-	{	while(*szText==szDelim[0]) szText++;	// skip leading whitespace
+{	if(m_bIsCryptStr)
+        return Decrypt().Token(iNum, szDelim, bUseQuotes);
+    std::vector<char*> vTokens;
+    CString sTemp(m_szString);
+    char *szText=sTemp.Str();
+    bool bInQuotes=false;
+    while(*szText)
+    {	while(*szText==szDelim[0])
+            szText++;	// skip leading whitespace
 		bInQuotes=(*szText=='\"');				// see if this token is quoted
 		if(bInQuotes) szText++;					// skip leading quote
 		vTokens.push_back(szText);				// store position of current token
 		if(bInQuotes)
 		{	// find next quote followed by a space or terminator
-			while(*szText&&!(*szText=='\"'&&(szText[1]==' '||szText[1]=='\0'))) szText++;
+            while(*szText&&!(*szText=='\"'&&(szText[1]==' '||szText[1]=='\0')))
+                szText++;
 			if(*szText)
-			{	*szText='\0'; if(szText[1]) szText+=2; }
+            {
+                *szText='\0';
+                if(szText[1])
+                    szText+=2;
+            }
 		}
 		else // !bInQuotes
 		{	// skip to next non-whitespace/delimiter character
-			while(*szText&&*szText!=szDelim[0]) szText++;
+            while(*szText&&*szText!=szDelim[0])
+                szText++;
 			if(*szText&&*szText==szDelim[0])
-			{	*szText='\0'; szText++; }
+            {
+                *szText='\0';
+                szText++;
+            }
 		} // if(bInQuotes)
 	} // while(*szText)
-	if(iNum>=vTokens.size()) return CString("");
-	return CString(vTokens.at(iNum)); }
+    if(iNum>=vTokens.size())
+        return CString("");
+    return CString(vTokens.at(iNum));
+}
 CString CString::Token(int iNum, const char *szDelim) { return Token(iNum, szDelim, false); }
 
 void CString::operator=(const CString &sStr) { Assign(sStr); }

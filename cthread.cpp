@@ -25,7 +25,8 @@ void CThread::CleanupPThreads() {
 }
 
 bool CThread::Start() {
-	if(!pthread_create(&m_tThread, NULL, &this->RunWrapper, this)) return true;
+    if(!pthread_create(&m_tThread, NULL, &this->RunWrapper, this))
+        return true;
 	return false;
 }
 

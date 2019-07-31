@@ -15,12 +15,17 @@ bool CSSLSocket::Init()
 {	m_bConnected=false;
 	
 	// Initialize the context, exit if fails
-	m_psslCtx=SSL_CTX_new(SSLv23_method());	if(!m_psslCtx) return false;
+    m_psslCtx=SSL_CTX_new(SSLv23_method());
+    if(!m_psslCtx)
+        return false;
 	// Initialize the object, exit if fails
-	m_pSSL=SSL_new(m_psslCtx);				if(!m_pSSL) return false;
+    m_pSSL=SSL_new(m_psslCtx);
+    if(!m_pSSL)
+        return false;
 
 	// Success
-	return true; }
+    return true;
+}
 
 bool CSSLSocket::AttachToSocket(int sSocket)
 {	m_bConnected=false;

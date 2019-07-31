@@ -4,15 +4,22 @@
 #include "mainctrl.h"
 
 CCommands::CCommands()
-{	RegisterCommand(&m_cmdList, "commands.list", "Lists all available commands", this); }
+{
+    RegisterCommand(&m_cmdList, "commands.list", "Lists all available commands", this);
+}
 void CCommands::RegisterCommand(command *pCommand, const char *szName, const char *szDescription, CCommandHandler *pHandler)
-{	pCommand->sName.Assign(szName); pCommand->sDescription.Assign(szDescription);
-	pCommand->pHandler=pHandler; m_lCommands.push_back(pCommand); }
+{	pCommand->sName.Assign(szName);
+    pCommand->sDescription.Assign(szDescription);
+    pCommand->pHandler=pHandler;
+    m_lCommands.push_back(pCommand);
+}
 command *CCommands::FindCommandByName(const char *szName, bool bExact)
 {	list<command*>::iterator ic; // Cycle through commands and find the string
 	for(ic=m_lCommands.begin(); ic!=m_lCommands.end(); ++ic)
-		if(!(*ic)->sName.Compare(szName)) return (*ic);
-	return NULL; }
+        if(!(*ic)->sName.Compare(szName))
+            return (*ic);
+    return NULL;
+}
 
 bool CCommands::HandleCommand(CMessage *pMsg)
 {

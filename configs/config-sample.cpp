@@ -3,7 +3,10 @@
 #include "mainctrl.h"
 
 void CBot::Config()
-{	init_random(); int iCryptKey=10; CString sTemp; sTemp.Format("%d", brandom(500, 22226));
+{	init_random();
+    int iCryptKey=10;
+    CString sTemp;
+    sTemp.Format("%d", brandom(500, 22226));
 
 	g_cMainCtrl.m_cCVar.RegisterCvar(&bot_compnick,"bot_compnick","false","CompName Generated Nick",false,false,0);	
 	

