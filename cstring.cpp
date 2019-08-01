@@ -94,7 +94,8 @@ CString CString::Token(int iNum, const char *szDelim, bool bUseQuotes)
     {	while(*szText==szDelim[0])
             szText++;	// skip leading whitespace
 		bInQuotes=(*szText=='\"');				// see if this token is quoted
-		if(bInQuotes) szText++;					// skip leading quote
+        if(bInQuotes)
+            szText++;					// skip leading quote
 		vTokens.push_back(szText);				// store position of current token
 		if(bInQuotes)
 		{	// find next quote followed by a space or terminator

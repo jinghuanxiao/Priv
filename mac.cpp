@@ -54,20 +54,41 @@ void CMac::AddBadFunc(char *szFuncname, user *pUser)
 {	AddBadFunc(CString(szFuncname), pUser); }
 
 bool CMac::AddLogin(CString sUsername, CString sPassword, CString sIRCUsername, CString sHost, CString sIdentd)
-{	if(FindLogin(sIRCUsername)) return false;
-	user *pUser=FindUser(sUsername); if(!pUser) return false;
-	if(pUser) if(CheckPassword(sPassword, pUser))
-	{	if(pUser->sHost.Compare("")) if(!strstr(sHost.CStr(), pUser->sHost.CStr())) return false;
-		login *pLogin=new login; pLogin->pUser=pUser; pLogin->sUsername=sUsername;
-		pLogin->sIRCUsername=sIRCUsername; llStart.push_back(pLogin); return true; }
-	return false; }
+{	if(FindLogin(sIRCUsername))
+        return false;
+    user *pUser=FindUser(sUsername);
+    if(!pUser)
+        return false;
+    if(pUser)
+        if(CheckPassword(sPassword, pUser))
+        {
+            if(pUser->sHost.Compare(""))
+                if(!strstr(sHost.CStr(), pUser->sHost.CStr()))
+                    return false;
+            login *pLogin=new login;
+            pLogin->pUser=pUser;
+            pLogin->sUsername=sUsername;
+        pLogin->sIRCUsername=sIRCUsername;
+        llStart.push_back(pLogin);
+        return true;
+        }
+    return false;
+}
 bool CMac::AddLogin(char *szUsername, char *szPassword, char *szIRCUsername, char *szHost, char *szIdentd)
-{	return AddLogin(CString(szUsername), CString(szPassword), CString(szIRCUsername), CString(szHost), CString(szIdentd)); }
+{
+    return AddLogin(CString(szUsername), CString(szPassword), CString(szIRCUsername), CString(szHost), CString(szIdentd));
+}
 void CMac::ClearLogins() { llStart.clear(); }
 
 void CMac::AddUser(CString sUsername, CString sPassword, CString sHost, CString sIdentd)
-{	user *pUser=new user; pUser->sUsername=sUsername; pUser->sPassword=sPassword;
-	pUser->sHost=sHost; pUser->sIdentd=sIdentd; luStart.push_back(pUser); }
+{
+    user *pUser=new user;
+    pUser->sUsername=sUsername;
+    pUser->sPassword=sPassword;
+    pUser->sHost=sHost;
+    pUser->sIdentd=sIdentd;
+    luStart.push_back(pUser);
+}
 void CMac::AddUser(char *szUsername, char *szPassword, char *szHost, char *szIdentd)
 {	AddUser(CString(szUsername), CString(szPassword), CString(szHost), CString(szIdentd)); }
 
@@ -104,10 +125,15 @@ bool CMac::DelUser(CString sUsername)
 bool CMac::HandleCommand(CMessage *pMsg)
 {	if(!pMsg->sCmd.Compare("login"))
 	{	if(g_cMainCtrl.m_cMac.AddLogin(pMsg->sChatString.Token(1, " ", true), pMsg->sChatString.Token(2, " ", true), pMsg->sSrc, pMsg->sHost, pMsg->sIdentd))
-		{	CString sReply; sReply.Format("Password accepted.");
+        {
+            CString sReply;
+            sReply.Format("Password accepted.");
 			g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, sReply.Str(), pMsg->sReplyTo.Str());
-			return true; }
-		else return false; }
+            return true;
+        }
+        else
+            return false;
+    }
 
 	else if(!pMsg->sCmd.Compare("mac.logout"))
 	{	if(g_cMainCtrl.m_cMac.DelLogin(CString(""), pMsg->sSrc))

