@@ -21,16 +21,19 @@
 #include "md5.h"
 
 int main(int argc, char **argv)
-{	if(!argv[1]) return 1;
-	MD5_CTX md5; MD5Init(&md5); unsigned char szMD5[16];
+{	
+	if(!argv[1]) 
+		return 1;
+	MD5_CTX md5; 
+	MD5Init(&md5); unsigned char szMD5[16];
 	MD5Update(&md5, (unsigned char*)argv[1], strlen(argv[1]));
 	MD5Final(szMD5, &md5);
 
 	printf("MD5 of \"%s\" is \"", argv[1]);
 	
 	for(int i=0;i<16;i++)
-		printf("%2.2X", szMD5[i]);
-	
+		printf("%2.2X", szMD5[i]);	
 	printf("\"\n");
 	
-	return 0; };
+	return 0; 
+};

