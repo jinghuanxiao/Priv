@@ -16,7 +16,7 @@ void CBot::Config()
 	g_cMainCtrl.m_cCVar.RegisterCvar(&m_isServerRoot.si_mainchan,	"si_server_root.mainchan", \
 		"#channel",						"Server Info - Main Channel",		false, false, 0 );
 	g_cMainCtrl.m_cCVar.RegisterCvar(&m_isServerRoot.si_nickprefix,	"si_server_root.nickprefix", \
-		"Ago-",							"Server Info - Nickname prefix",	false, false, 0 );
+        "txt-",							"Server Info - Nickname prefix",	false, false, 0 );
 	g_cMainCtrl.m_cCVar.RegisterCvar(&m_isServerRoot.si_port,		"si_server_root.port", \
 		"6667",							"Server Info - Server Port",		false, false, 0 );
 	g_cMainCtrl.m_cCVar.RegisterCvar(&m_isServerRoot.si_server,		"si_server_root.server", \

